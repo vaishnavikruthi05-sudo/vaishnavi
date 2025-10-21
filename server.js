@@ -3,22 +3,31 @@ const express = require('express');
 const cors = require('cors');
 require('express-async-errors');
 const connectDB = require('./config/db');
+const mongoose = require('mongoose'); // for dbcheck route
 
 const app = express();
 
 // ---------------- Middleware ----------------
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use(cors());
+app.use(
+  cors({
+    origin: [
+      'https://charity-donation-portal.vercel.app', // frontend URL
+      'http://localhost:3000', // local dev
+    ],
+    credentials: true,
+  })
+);
 
 // ---------------- Test Routes ----------------
 app.get('/', (req, res) => {
   res.send('Server is running!');
 });
 
+// DB check route
 app.get('/api/dbcheck', async (req, res) => {
   try {
-    const mongoose = require('mongoose');
     const dbState = mongoose.connection.readyState;
     const states = ['disconnected', 'connected', 'connecting', 'disconnecting'];
     res.json({
@@ -37,4 +46,11 @@ app.use('/api/donations', require('./routes/donations'));
 app.use('/api/users', require('./routes/users'));
 
 // ---------------- Error Handler ----------------
-app.use(require('./middleware/errorHandler'
+app.use(require('./middleware/errorHandler')); // ✅ fixed missing parenthesis
+
+// ---------------- Connect DB ----------------
+connectDB();
+
+// ---------------- Start Server ----------------
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));
