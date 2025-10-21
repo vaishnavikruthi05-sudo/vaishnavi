@@ -25,7 +25,7 @@ app.get('/', (req, res) => {
   res.send('Server is running!');
 });
 
-// DB check route
+// ---------------- DB Check Route ----------------
 app.get('/api/dbcheck', async (req, res) => {
   try {
     const dbState = mongoose.connection.readyState;
@@ -39,6 +39,15 @@ app.get('/api/dbcheck', async (req, res) => {
   }
 });
 
+// ---------------- ENV Check Route (TEMP) ----------------
+app.get('/api/envcheck', (req, res) => {
+  res.json({
+    mongodb_uri: process.env.MONGODB_URI ? 'Loaded ✅' : 'Missing ❌',
+    jwt_secret: process.env.JWT_SECRET ? 'Loaded ✅' : 'Missing ❌',
+    port: process.env.PORT ? process.env.PORT : 'Default 5000',
+  });
+});
+
 // ---------------- Main Routes ----------------
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/campaigns', require('./routes/campaigns'));
@@ -46,7 +55,7 @@ app.use('/api/donations', require('./routes/donations'));
 app.use('/api/users', require('./routes/users'));
 
 // ---------------- Error Handler ----------------
-app.use(require('./middleware/errorHandler')); // ✅ fixed missing parenthesis
+app.use(require('./middleware/errorHandler')); // ✅ fixed parenthesis
 
 // ---------------- Connect DB ----------------
 connectDB();
