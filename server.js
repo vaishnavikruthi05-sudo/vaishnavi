@@ -21,8 +21,10 @@ app.use(
 
 // ---------------- Debug log for Render ----------------
 console.log('MONGODB_URI (Render env):', process.env.MONGODB_URI);
+console.log('JWT_SECRET (Render env):', process.env.JWT_SECRET);
+console.log('PORT (Render env):', process.env.PORT);
 
-// ---------------- Test Routes ----------------
+// ---------------- Test Route ----------------
 app.get('/', (req, res) => {
   res.send('Server is running!');
 });
@@ -56,7 +58,21 @@ app.use('/api/users', require('./routes/users'));
 app.use(require('./middleware/errorHandler'));
 
 // ---------------- Connect DB ----------------
-connectDB();
+(async () => {
+  try {
+    const mongoURI = process.env.MONGODB_URI;
+    if (!mongoURI) throw new Error('MONGODB_URI is not set!');
+    await mongoose.connect(mongoURI, {
+      dbName: 'charitydb',
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+    console.log('✅ MongoDB connected successfully');
+  } catch (err) {
+    console.error('❌ MongoDB connection error:', err.message);
+    process.exit(1); // stop server if DB fails
+  }
+})();
 
 // ---------------- Start Server ----------------
 const PORT = process.env.PORT || 5000;
