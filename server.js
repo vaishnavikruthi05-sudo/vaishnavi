@@ -56,7 +56,7 @@ app.use('/api/users', require('./routes/users'));
 // ---------------- Error Handler ----------------
 app.use(require('./middleware/errorHandler'));
 
-// ---------------- Connect DB ----------------
+// ---------------- Connect to MongoDB ----------------
 (async () => {
   const mongoURI = process.env.MONGODB_URI;
   if (!mongoURI) {
