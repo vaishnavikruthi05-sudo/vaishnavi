@@ -2,7 +2,6 @@ const express = require('express');
 const cors = require('cors');
 require('express-async-errors');
 const mongoose = require('mongoose');
-const connectDB = require('./config/db');
 
 const app = express();
 
@@ -59,9 +58,13 @@ app.use(require('./middleware/errorHandler'));
 
 // ---------------- Connect DB ----------------
 (async () => {
+  const mongoURI = process.env.MONGODB_URI;
+  if (!mongoURI) {
+    console.error('❌ MONGODB_URI is not set! Please add it in Render dashboard.');
+    process.exit(1);
+  }
+
   try {
-    const mongoURI = process.env.MONGODB_URI;
-    if (!mongoURI) throw new Error('MONGODB_URI is not set!');
     await mongoose.connect(mongoURI, {
       dbName: 'charitydb',
       useNewUrlParser: true,
@@ -70,7 +73,7 @@ app.use(require('./middleware/errorHandler'));
     console.log('✅ MongoDB connected successfully');
   } catch (err) {
     console.error('❌ MongoDB connection error:', err.message);
-    process.exit(1); // stop server if DB fails
+    process.exit(1);
   }
 })();
 
